@@ -1,0 +1,22 @@
+{
+    "Group": "Trinex",
+    "Name": "Homes",
+    "Version": "0.0.2",
+    "Description": "Adds home teleports to Hytale!",
+    "Authors": [
+        {
+            "Name": "ZenJakey"
+        }
+    ],
+    "Website": "",
+    "ServerVersion": "*",
+    "Dependencies": {
+        "Trinex:Library": "*"
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "com.trinex.homes.Homes",
+    "IncludesAssetPack": true
+}
