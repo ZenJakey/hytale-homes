@@ -4,6 +4,7 @@ plugins {
     id 'org.jetbrains.kotlin.jvm'
     id 'java-library'
     id 'maven-publish'
+    id 'com.gradleup.shadow' version '9.3.1'
 }
 
 import org.gradle.internal.os.OperatingSystem
@@ -52,9 +53,25 @@ javadoc {
 // compile against their code. This requires you to have Hytale installed using
 // the official launcher for now.
 dependencies {
-    implementation(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
+    compileOnly(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation("com.trinex:TrinexLib:+")
+    compileOnly("com.trinex:TrinexLib:+")
+}
+
+tasks.named('shadowJar') {
+    archiveClassifier.set('') // produce TrinexLib-0.0.4.jar (not *-all.jar)
+    relocate 'com.google.gson', 'com.homes.libs.gson'
+    minimize()
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+}
+
+// Ensure `build` produces the shaded jar, and avoid producing a confusing thin jar.
+tasks.named('build') {
+    dependsOn(tasks.named('shadowJar'))
+}
+
+tasks.named('jar') {
+    enabled = false
 }
 
 // Create the working directory to run the server if it does not already exist.

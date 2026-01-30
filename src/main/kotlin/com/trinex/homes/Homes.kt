@@ -17,6 +17,7 @@ class Homes(
     init: JavaPluginInit,
 ) : JavaPlugin(init) {
     val config = this.withConfig("Homes", HomesConfig.CODEC)
+    private val LOGGER = HytaleLogger.forEnclosingClass()
     private lateinit var homePlayerDataComponent: ComponentType<EntityStore?, HomePlayerData>
     val messenger = Messenger("Homes")
 
@@ -40,8 +41,4 @@ class Homes(
     }
 
     fun getPlayerHomeDataComponent(): ComponentType<EntityStore?, HomePlayerData> = homePlayerDataComponent
-
-    companion object {
-        private val LOGGER = HytaleLogger.forEnclosingClass()
-    }
 }
