@@ -57,8 +57,8 @@ configurations {
 
 dependencies {
     // Provided by the server at runtime; needed for compilation + IDE run only
-    compileOnly(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
-    runtimeOnly(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
+    compileOnly("com.hypixel.hytale:Server:+")
+    runtimeOnly("com.hypixel.hytale:Server:+")
     implementation("com.trinex:TrinexLib:+")
     // Only put things you actually want inside the fat jar here:
     shade("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
@@ -162,6 +162,14 @@ tasks.register('generateVSCodeLaunch') {
 repositories {
     mavenCentral()
     mavenLocal()
+    maven {
+        name = "hytale-release"
+        url = uri("https://maven.hytale.com/release")
+    }
+    maven {
+        name = "hytale-pre-release"
+        url = uri("https://maven.hytale.com/pre-release")
+    }
 }
 kotlin {
     jvmToolchain(25)
