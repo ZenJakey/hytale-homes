@@ -7,6 +7,9 @@ plugins {
     id 'com.gradleup.shadow' version '9.3.1'
 }
 
+
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -48,13 +51,13 @@ java {
 javadoc {
     options.addStringOption('Xdoclint:-missing', '-quiet')
 }
+
 // Adds the Hytale server as a build dependency, allowing you to reference and
 // compile against their code. This requires you to have Hytale installed using
 // the official launcher for now.
 configurations {
     shade
 }
-
 dependencies {
     // Provided by the server at runtime; needed for compilation + IDE run only
     compileOnly("com.hypixel.hytale:Server:+")
@@ -71,7 +74,6 @@ tasks.named("shadowJar") {
     minimize()
     exclude "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA"
 }
-
 // Ensure `build` produces the shaded jar, and avoid producing a confusing thin jar.
 tasks.named('build') {
     dependsOn(tasks.named('shadowJar'))
@@ -96,10 +98,10 @@ tasks.register('updatePluginManifest') {
         if (!manifestFile.exists()) {
             throw new GradleException("Could not find manifest.json at ${manifestFile.path}!")
         }
-        def manifestJson = new groovy.json.JsonSlurper().parseText(manifestFile.text)
+        def manifestJson = new JsonSlurper().parseText(manifestFile.text)
         manifestJson.Version = version
         manifestJson.IncludesAssetPack = includes_pack.toBoolean()
-        manifestFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifestJson))
+        manifestFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(manifestJson))
     }
 }
 
@@ -156,7 +158,7 @@ tasks.register('generateVSCodeLaunch') {
                         ]
                 ]
         ]
-        launchFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(launchConfig))
+        launchFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(launchConfig))
     }
 }
 repositories {
@@ -181,21 +183,20 @@ kotlin {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // Don't publish the thin jar coming from components.java
-            // (it won't exist because jar is disabled).
-            // from components.java
+            // from components.java  // keep this disabled if jar is disabled
 
-            // Publish the shaded jar as the main artifact:
             artifact(tasks.named("shadowJar"))
+            artifact(tasks.named("sourcesJar"))
+            artifact(tasks.named("javadocJar"))
 
-            // Keep these if you want custom coordinates:
             groupId = 'com.trinex'
-            artifactId = 'TrinexLib'
         }
     }
 }
 tasks.named("publishMavenJavaPublicationToMavenLocal") {
     dependsOn(tasks.named("shadowJar"))
+    dependsOn(tasks.named("sourcesJar"))
+    dependsOn(tasks.named("javadocJar"))
 }
 
 // Ensure Java compilation also targets 24 bytecode to match Kotlin
