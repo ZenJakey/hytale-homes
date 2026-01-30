@@ -8,5 +8,5 @@ Adds 4 commands
 
 There is a config file to change how many homes each player can have, and the teleport delay to them.
 
-Get this mod here: https://github.com/ZenJakey/hytale-homes/releases 
+Get this mod here: https://github.com/ZenJakey/hytale-homes/releases  
 This mod requires: https://github.com/ZenJakey/hytale-trinexlib/releases
