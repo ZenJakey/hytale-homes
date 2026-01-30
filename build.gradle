@@ -48,21 +48,28 @@ java {
 javadoc {
     options.addStringOption('Xdoclint:-missing', '-quiet')
 }
-
 // Adds the Hytale server as a build dependency, allowing you to reference and
 // compile against their code. This requires you to have Hytale installed using
 // the official launcher for now.
-dependencies {
-    compileOnly(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compileOnly("com.trinex:TrinexLib:+")
+configurations {
+    shade
 }
 
-tasks.named('shadowJar') {
-    archiveClassifier.set('') // produce TrinexLib-0.0.4.jar (not *-all.jar)
-    relocate 'com.google.gson', 'com.homes.libs.gson'
+dependencies {
+    // Provided by the server at runtime; needed for compilation + IDE run only
+    compileOnly(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
+    runtimeOnly(files("$hytaleHome/install/$patchline/package/game/latest/Server/HytaleServer.jar"))
+    implementation("com.trinex:TrinexLib:+")
+    // Only put things you actually want inside the fat jar here:
+    shade("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    // shade("group:artifact:version") ...
+}
+
+tasks.named("shadowJar") {
+    configurations = [project.configurations.shade]
+    archiveClassifier.set("")
     minimize()
-    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
+    exclude "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA"
 }
 
 // Ensure `build` produces the shaded jar, and avoid producing a confusing thin jar.
